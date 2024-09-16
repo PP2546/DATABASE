@@ -68,7 +68,6 @@ class DiaryEntryController extends Controller
         if (!empty($validated['emotions']) && !empty($validated['intensity'])) {
             foreach ($validated['emotions'] as $emotionId) {
                 $intensity = $validated['intensity'][$emotionId] ?? null;
-                // เชื่อมต่ออารมณ์และความเข้มข้นกับบันทึก
                 $diaryEntry->emotions()->attach($emotionId, ['intensity' => $intensity]);
             }
         }
@@ -144,5 +143,22 @@ class DiaryEntryController extends Controller
 
         // เปลี่ยนเส้นทางกลับไปยังรายการบันทึกด้วยข้อความความสำเร็จ
         return redirect()->route('diary.index')->with('status', 'Diary entry deleted successfully!');
+    }
+
+    public function conflict_diary()
+    {
+        $userId = Auth::id();
+        $diaryEntries = DB::table('users as u')
+        
+            ->join('diary_entries as de' , 'u.id' , '=' , 'de.user_id')
+            ->join('diary_entry_emotions as dee' , 'de.id' , '=' , 'dee.diary_entry_id')
+            ->join('emotions as e', 'dee.emotion_id', '=', 'e.id')
+            ->where('u.id' , $userId)
+            ->where('dee.emotion_id' , 2)
+            ->where('de.content' , 'like' , '%happy%')
+            ->select('de.id', 'de.date', 'de.content', 'e.name as emotion_name', 'dee.intensity')  // Select relevant columns
+            ->get();
+
+        return view('getconflict.conflicting_emotion', compact('diaryEntries'));
     }
 }

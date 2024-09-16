@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DiaryEntryController;
+use App\Http\Controllers\GetConflictController;
 
 // เส้นทางสาธารณะ
 Route::get('/', function () {
@@ -19,6 +20,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     // เส้นทางการจัดการบันทึกไดอารี่ (CRUD)
     Route::resource('diary', DiaryEntryController::class);
+    Route::get('/conflict_emotion', [DiaryEntryController::class, 'conflict_diary'])->name('getconflict.conflicting_emotion');
 
     // การจัดการโปรไฟล์
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
